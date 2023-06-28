@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Plant Catalog</title>
+  <style>
+  
+  
+  * {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Verdana;
+  padding: 20px;
+  margin: 0;
+  padding: 0;
+  color : white;
+  background-image: url('bg1.jpg');
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-attachment: fixed;
+  background-size: cover;
+  
+}
+
+/* Header Title */
+.header {
+  overflow: hidden;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  padding: 0px;
+  font-size: 20px;
+  text-align: center;
+  background:rgba(0, 0, 0, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+}
+
+.header img {
+    width: 50px;
+	height: 60px;
+	margin-right: 10px;
+}
+
+.header h2 {
+  margin-right: 10px;
+}
+
+/* Create two unequal columns that floats next to each other */
+/* Left column */
+.leftcolumn {   
+  float: left;
+  width: 25%;
+  position: fixed; 
+}
+
+/* Right column */
+.rightcolumn {
+  float: right;
+  width: 75%;
+  padding-left: 20px;
+}
+
+
+/* Add a card effect for articles */
+.card {
+   background:rgba(0, 0, 0, 0.7);
+   padding: 20px;
+   margin-top: 110px;
+}
+
+/* Clear floats after the columns */
+.row:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+
+.inputFields {
+  margin: 12px 0;
+  font-size: 15px;
+  padding: 10px;
+  width: 320px;
+  border: 1px solid #383838;
+  border-top: 1px solid #383838;
+  border-left: 1px solid #383838;
+  border-right: 1px solid #383838;
+  background: rgba(20, 20, 20, .2);
+  color: white;
+  outline: none;
+  font-family: Verdana;
+}
+
+
+
+#saveButton {
+font-family: Verdana;
+  border: 1px solid rgba(20, 255, 20, 1);
+  background: rgba(20, 20, 20, .6);
+  font-size: 15px;
+  color: white;
+  margin-top: 20px;
+  padding: 10px 50px;
+  cursor: pointer;
+  transition: .4s;
+  &:hover {
+    background: rgba(20, 20, 20, .8);
+    padding: 10px 138px;
+  }
+}
+
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+th {
+    padding: 20px;
+    text-align: left;
+	background-color: black;
+}
+
+td {
+    padding: 20px;
+    text-align: left;
+}
+	
+tr:nth-child(even) {
+  background-color: #383838;
+}
+
+tr:hover {background-color:black;}
+  </style>
+  
+  <script>
+    // Function to load plant catalog data from XML
+    function loadPlantCatalog() {
+      var xhttp = new XMLHttpRequest();
+      xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+          var xmlDoc = this.responseXML;
+          var plants = xmlDoc.getElementsByTagName("PLANT");
+          var plantData = [];
+
+          for (var i = 0; i < plants.length; i++) {
+            var common = plants[i].getElementsByTagName("COMMON")[0].textContent;
+            var botanical = plants[i].getElementsByTagName("BOTANICAL")[0].textContent;
+            var zone = plants[i].getElementsByTagName("ZONE")[0].textContent;
+            var light = plants[i].getElementsByTagName("LIGHT")[0].textContent;
+            var price = plants[i].getElementsByTagName("PRICE")[0].textContent;
+            var availability = plants[i].getElementsByTagName("AVAILABILITY")[0].textContent;
+
+            plantData.push({ common: common, botanical: botanical, zone: zone, light: light, price: price, availability: availability });
+          }
+
+          displayPlantCatalog(plantData);
+        }
+      };
+      xhttp.open("GET", "plant_catalog.xml", true);
+      xhttp.send();
+    }
+
+    // Function to display plant catalog on a table
+    function displayPlantCatalog(plantData) {
+      var table = document.getElementById("plantTable");
+      var tbody = document.createElement("tbody");
+
+      for (var i = 0; i < plantData.length; i++) {
+        var row = document.createElement("tr");
+
+        var commonCell = document.createElement("td");
+        commonCell.textContent = plantData[i].common;
+        row.appendChild(commonCell);
+
+        var botanicalCell = document.createElement("td");
+        botanicalCell.textContent = plantData[i].botanical;
+        row.appendChild(botanicalCell);
+
+        var zoneCell = document.createElement("td");
+        zoneCell.textContent = plantData[i].zone;
+        row.appendChild(zoneCell);
+
+        var lightCell = document.createElement("td");
+        lightCell.textContent = plantData[i].light;
+        row.appendChild(lightCell);
+
+        var priceCell = document.createElement("td");
+        priceCell.textContent = plantData[i].price;
+        row.appendChild(priceCell);
+
+        var availabilityCell = document.createElement("td");
+        availabilityCell.textContent = plantData[i].availability;
+        row.appendChild(availabilityCell);
+
+        row.addEventListener("click", function() {
+          populateFormFields(this);
+        });
+
+        tbody.appendChild(row);
+      }
+
+      table.appendChild(tbody);
+    }
+
+    // Function to populate form fields when a plant is selected
+    function populateFormFields(row) {
+      var common = row.cells[0].textContent;
+      var botanical = row.cells[1].textContent;
+      var zone = row.cells[2].textContent;
+      var light = row.cells[3].textContent;
+      var price = row.cells[4].textContent;
+      var availability = row.cells[5].textContent;
+
+      document.getElementById("commonInput").value = common;
+      document.getElementById("botanicalInput").value = botanical;
+      document.getElementById("zoneInput").value = zone;
+      document.getElementById("lightInput").value = light;
+      document.getElementById("priceInput").value = price;
+      document.getElementById("availabilityInput").value = availability;
+
+      row.parentNode.querySelectorAll(".selected").forEach(function(element) {
+        element.classList.remove("selected");
+      });
+
+      row.classList.add("selected");
+    }
+
+    // Function to update the plant's data in the table
+    function updatePlantData() {
+      var common = document.getElementById("commonInput").value;
+      var botanical = document.getElementById("botanicalInput").value;
+      var zone = document.getElementById("zoneInput").value;
+      var light = document.getElementById("lightInput").value;
+      var price = document.getElementById("priceInput").value;
+      var availability = document.getElementById("availabilityInput").value;
+
+      var selectedRow = document.querySelector("#plantTable tbody tr.selected");
+      if (selectedRow) {
+        selectedRow.cells[0].textContent = common;
+        selectedRow.cells[1].textContent = botanical;
+        selectedRow.cells[2].textContent = zone;
+        selectedRow.cells[3].textContent = light;
+        selectedRow.cells[4].textContent = price;
+        selectedRow.cells[5].textContent = availability;
+      }
+	  
+	  // Clear the form fields
+  document.getElementById("commonInput").value = "";
+  document.getElementById("botanicalInput").value = "";
+  document.getElementById("zoneInput").value = "";
+  document.getElementById("lightInput").value = "";
+  document.getElementById("priceInput").value = "";
+  document.getElementById("availabilityInput").value = "";
+    }
+
+    // Load plant catalog when the page is loaded
+    window.onload = function() {
+      loadPlantCatalog();
+      document.getElementById("saveButton").addEventListener("click", updatePlantData);
+    };
+  </script>
+</head>
+<body>
+
+  
+  
+  
+  
+  
+  <div class="header" >
+  <h2>List of Plants</h2>
+  <img src="logo.gif" alt="Logo">
+</div>
+
+<div class="row">
+  <div class="leftcolumn">
+    <div class="card">
+<br>
+  <h1>Plant Details</h1>
+  <form>
+  
+  
+    <label for="commonInput"></label>
+    <input type="text" id="commonInput" class="inputFields" placeholder = "Common Name"><br>
+
+    <label for="botanicalInput"></label>
+    <input type="text" id="botanicalInput" class="inputFields" placeholder = "Botanical Name"><br>
+
+    <label for="zoneInput"></label>
+    <input type="text" id="zoneInput" class="inputFields" placeholder = "Zone"><br>
+
+    <label for="lightInput"></label>
+    <input type="text" id="lightInput" class="inputFields" placeholder = "Light"><br>
+
+    <label for="priceInput"></label>
+    <input type="text" id="priceInput" class="inputFields" placeholder = "Price"><br>
+
+    <label for="availabilityInput"></label>
+    <input type="text" id="availabilityInput" class="inputFields" placeholder = "Availability"><br>
+
+    <button type="button" id="saveButton">Save</button>
+  </form>
+      
+    </div>
+
+  </div>
+  <div class="rightcolumn">
+    <div class="card">
+			  <table id="plantTable">
+				<thead>
+				  <tr>
+					<th>Common Name</th>
+					<th>Botanical Name</th>
+					<th>Zone</th>
+					<th>Light</th>
+					<th>Price</th>
+					<th>Availability</th>
+				  </tr>
+				</thead>
+			  </table>
+    </div>
+
+
+  </div>
+</div>
+
+</body>
+</html>
